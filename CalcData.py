@@ -15,6 +15,7 @@ pd.set_option('display.width', 1000)
 
 def 	Net(stocks,Stock_Data):
 	Net_Worth = 0
+	Net_Worth = 0
 	for ticker in stocks.Tickers:
 		Net_Worth = Net_Worth + Stock_Data['Worth: '+ ticker].iloc[-1]
 
