@@ -8,6 +8,7 @@ import csv
 import matplotlib.dates as mdates
 import CalcData
 from mpl_finance import candlestick_ohlc
+from pandas.tseries.offsets import BDay
 pd.set_option('display.height', 1000)
 pd.set_option('display.max_rows', 500)
 pd.set_option('display.max_columns', 500)
@@ -53,49 +54,40 @@ def plot_net(stocks,Data):
 
 
 def plot_stock(Data,stock):
-	months = mdates.MonthLocator() 
 	Moving_ = 0;
 	Legends = pd.DataFrame({'Tickers':[]})
 	Average1= 10
 	Average2= 20
 	Moving_10 = np.round(pd.rolling_mean(Data['Adj Close: '+ stock.Tickers],window=Average1),10)
 	Moving_20 = np.round(pd.rolling_mean(Data['Adj Close: '+ stock.Tickers],window=Average2),20)
-	
-
-
+	dates2 = pd.to_datetime(Data.Date, format='%Y-%m-%d')
+	dates = mdates.date2num(dates2)
 	left, width = 0.1, 0.8
 	axescolor = '#f6f6f6'
-	rect1 = [left, 0.7, width, 0.2]
-	rect2 = [left, 0.3, width, 0.4]
-	fig=plt.figure(facecolor='#07000d')
-	ax1 = fig.add_axes(rect1)  # left, bottom, width, height
-	ax2 = fig.add_axes(rect2, sharex=ax1)
-	fillcolor = 'darkgoldenrod'
+
+	fig, (ax1, ax2) = plt.subplots(2,1,figsize=(20, 10), gridspec_kw = {'height_ratios':[1, 3]},sharex=True)
 
 	rsi = CalcData.rsi(Data["Adj Close: "+stock.Tickers])
-	ax1.plot(Data.Date, rsi, color=fillcolor)
-	ax1.axhline(70, color=fillcolor)
-	ax1.axhline(30, color=fillcolor)
-	ax1.fill_between(Data.Date, rsi, 70, where=(rsi >= 70), facecolor=fillcolor, edgecolor=fillcolor)
-	ax1.fill_between(Data.Date, rsi, 30, where=(rsi <= 30), facecolor=fillcolor, edgecolor=fillcolor)
+	ax2.plot_date(dates,Moving_10,fmt='-')
+	ax2.plot_date(dates,Moving_20,fmt='-')
+	ax2.plot_date(dates,Data['Adj Close: '+stock.Tickers],fmt='-')
+
+
+	ax1.plot_date(dates,rsi, color='b',fmt='-')
+	ax1.axhline(70, color='r')
+	ax1.axhline(30, color='g')
 	ax1.text(0.6, 0.9, '>70 = overbought', va='top', transform=ax1.transAxes, fontsize=9)
 	ax1.text(0.6, 0.1, '<30 = oversold', transform=ax1.transAxes, fontsize=9)
 	ax1.set_ylim(0, 100)
 	ax1.set_yticks([30, 70])
 	ax1.text(0.025, 0.95, 'RSI (14)', va='top', transform=ax1.transAxes, fontsize=9)
 	ax1.set_title('%s daily' % stock.Tickers)
+	Legends.loc[len(Legends)] = stock.Tickers+": MA"+str(Average1)
+	Legends.loc[len(Legends)] = stock.Tickers+": MA"+str(Average2)
+	Legends.loc[len(Legends)] = stock.Tickers
+	ax2.legend(Legends.Tickers)
 
-
-	ax2.plot(Data.Date,Moving_10)
-	ax2.plot(Moving_20)
-	# Data['Adj Close: '+stock.Tickers].plot(grid=True)
-
-	# Legends.loc[len(Legends)] = stock.Tickers+": MA"+str(Average1)
-	# Legends.loc[len(Legends)] = stock.Tickers+": MA"+str(Average2)
-	# Legends.loc[len(Legends)] = stock.Tickers
-
-	# plt.legend(Legends.Tickers)
-	# plt.gcf().autofmt_xdate()
+	fig.autofmt_xdate()
 	plt.show()
 
 
