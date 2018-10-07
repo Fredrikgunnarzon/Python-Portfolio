@@ -3,11 +3,6 @@ import pandas_datareader as web
 import datetime
 import numpy as np
 from pandas import DataFrame
-import csv
-import matplotlib.pyplot as plt
-import plotly.figure_factory as ff
-import os
-import pickle
 import quandl
 
 

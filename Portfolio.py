@@ -1,10 +1,5 @@
 import pandas as pd 
-import pandas_datareader as web
-import datetime
-import numpy as np
 from pandas import DataFrame
-import csv
-import matplotlib.pyplot as plt
 import GetData
 import CalcData
 import portfolio_plot
@@ -53,7 +48,7 @@ def main():
 			portfolio_plot.plot_stocks(Stock_Data,_init_Portfolio)
 		elif output == "5":
 			Stock_Data = pd.read_csv('Stock_Data.csv', encoding='utf-8',parse_dates=True)
-			CalcData.Moving_Average(_init_Portfolio[(_init_Portfolio['Type']=='Stock')],Stock_Data,10)
+			CalcData.Moving_Average(Stock_Data,_init_Portfolio[(_init_Portfolio['Type']=='Stock')])
 		elif output == "6":
 			Stock_Data = pd.read_csv('Stock_Data.csv', encoding='utf-8',parse_dates=True)
 			portfolio_plot.plot_stock(Stock_Data, _init_Portfolio.iloc[int(output2)])
