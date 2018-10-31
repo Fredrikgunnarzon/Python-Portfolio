@@ -1,3 +1,10 @@
+###################################################################
+# Version 1.0 30 October 2018
+# Author: Fredrik Gunnarsson, fredrikgunnarsson@outlook.com
+###################################################################
+# Plots Data information for Portfolio program
+###################################################################
+
 import matplotlib.pyplot as plt
 import pandas as pd 
 import numpy as np
@@ -11,6 +18,24 @@ pd.set_option('display.max_columns', 500)
 pd.set_option('display.width', 1000)
 mpl.style.use('seaborn')
 
+# Debugging with: 	import pdb; pdb.set_trace()
+# c=cont; s=step; r=return; l=list; n=next; b=break; args= arguments
+
+
+def plot_risk(Data,_vec_derivative):
+	Risk_stats = CalcData.Portfolio_RiskStats(Data,_vec_derivative)
+	print(Risk_stats.sort_values('VaR'))
+	Risk_Value = CalcData.Portfolio_Risk(Data,_vec_derivative)
+	print('\n Total Portfolio Risk (Portfolio Variance, Portfolio Beta):'+str(Risk_Value))
+	plot_correlation_matrix(Data,_vec_derivative)
+
+
+def plot_correlation_matrix(Data,_vec_derivative):
+	log_returns = pd.DataFrame()
+	for ticker in _vec_derivative[(_vec_derivative['Type']=='Stock')].Tickers:
+		log_returns[ticker] = np.log(Data['Adj Close: '+ticker] / Data['Adj Close: '+ticker].shift(1))
+	pd.plotting.scatter_matrix(log_returns, diagonal='kde', alpha=0.9,figsize=(15,8),grid=True)
+	plt.show()
 
 
 def plot_stocks(Data,stocks):
@@ -47,17 +72,12 @@ def plot_net(stocks,Data):
 	plt.legend(stocks.Tickers)
 	plt.show()
 
-
-
-
-
-
 def plot_stock(Data,stock,i):
 	Legends 	= pd.DataFrame({'Tickers':[]})
 	Average1 	= 10
 	Average2 	= 20
-	Moving_10 	= np.round(Data['Adj Close: '+stock.Tickers.iloc[i]].rolling(window = Average1,center=False).mean(),10)
-	Moving_20 	= np.round(Data['Adj Close: '+stock.Tickers.iloc[i]].rolling(window = Average2,center=False).mean(),20)
+	Moving_10 	= np.round(Data['Adj Close: '+stock.Tickers.iloc[i]].rolling(window = Average1,center = False).mean(),10)
+	Moving_20 	= np.round(Data['Adj Close: '+stock.Tickers.iloc[i]].rolling(window = Average2,center = False).mean(),20)
 	vol 		= CalcData.computeVol(Data["Adj Close: "+stock.Tickers.iloc[i]],10)
 	log_returns = np.log(Data['Adj Close: '+stock.Tickers.iloc[i]] / Data['Adj Close: '+stock.Tickers.iloc[i]].shift(1))
 
@@ -72,12 +92,14 @@ def plot_stock(Data,stock,i):
 	ax2.plot_date(dates,Data['Adj Close: '+stock.Tickers.iloc[i]],fmt='-')
 	ax2.set_ylabel('Price')
 
+
 	ax3 = ax2.twinx()
 	ax3.plot_date(dates,vol,fmt='-')
 	ax3.legend('Volatility',loc='upper right')
 	ax3.set_ylabel('Volatility')
 	ax3.grid('False')
 	ax3.xaxis.set_tick_params(rotation=45)
+
 	Legends.loc[len(Legends)] = stock.Tickers.iloc[i]+": MA"+str(Average1)
 	Legends.loc[len(Legends)] = stock.Tickers.iloc[i]+": MA"+str(Average2)
 	Legends.loc[len(Legends)] = stock.Tickers.iloc[i]
@@ -89,7 +111,7 @@ def plot_stock(Data,stock,i):
 
 	stock=stock[(stock['Type']=='Stock')]
 	for ticker in stock.Tickers:
-		mean5 = np.round(Data['Adj Close: '+ticker].rolling(window = 5,center=False).mean(),5)
+		mean5 = np.round(Data['Adj Close: '+ticker].rolling(window = 5,center = False).mean(),5)
 		ax5.plot_date(dates, mean5/mean5.iloc[6],'-')
 	ax5.legend(stock.Tickers)
 	ax5.xaxis.set_tick_params(rotation=45)	
